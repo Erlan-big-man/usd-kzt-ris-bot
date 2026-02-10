@@ -7,25 +7,24 @@ TOKEN = os.getenv("BOT_TOKEN")
 bot = telebot.TeleBot(TOKEN)
 
 def get_rate():
-    """Получает реальный курс USD/KZT"""
+    """Получает свежий курс USD/KZT"""
     try:
         url = "https://api.exchangerate-api.com/v4/latest/USD"
-        response = requests.get(url)
-        data = response.json()
+        data = requests.get(url).json()
         return data['rates']['KZT']
-    except Exception as e:
-        return f"ошибка (не смог связаться с банком)"
+    except:
+        return "не удалось получить"
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    current_rate = get_rate()
+    rate = get_rate()
     text = (
-        f"🇰🇿 *Курс USD/KZT на сегодня:*\n"
-        f"💵 1 Доллар = *{current_rate}* тенге\n\n"
-        f"📈 Аналитика: Рынок стабилен. Резких скачков в ближайшие 2 часа не ожидается."
+        f"🇰🇿 *Курс USD/KZT:*\n"
+        f"💵 1$ = *{rate}* тенге\n\n"
+        f"📊 Анализ: Рынок стабилен. Сильных скачков пока не видно."
     )
     bot.send_message(message.chat.id, text, parse_mode="Markdown")
 
 # Запуск
-print("Бот вышел на охоту за курсом...")
+print("Бот проснулся и готов к аналитике...")
 bot.polling(non_stop=True)
