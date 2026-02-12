@@ -41,3 +41,6 @@ while True:
         bot.polling(non_stop=True)
     except:
         time.sleep(5)
+if name == "__main__":
+    keep_alive()  # Включаем "дверь" для Render
+    bot.infinity_polling() # Запускаем бота
