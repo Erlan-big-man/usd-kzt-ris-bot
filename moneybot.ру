@@ -1,4 +1,27 @@
 import os
+from threading import Thread
+from flask import Flask
+import telebot
+
+# Это заставляет Render думать, что твой бот — это сайт
+app = Flask('')
+@app.route('/')
+def home():
+    return "Я жив!"
+
+def run():
+    app.run(host='0.0.0.0', port=10000)
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
+
+# --- ТУТ НАЧИНАЕТСЯ ТВОЙ КОД ---
+token = "ТВОЙ_ТОКЕН_ИЗ_BOTFATHER" # Вставь сюда свой токен
+bot = telebot.TeleBot(token)
+
+# Твои функции (handlers) оставляй как были ниже...
+import os
 import telebot
 import time
 
