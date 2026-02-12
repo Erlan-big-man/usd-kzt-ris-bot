@@ -4,12 +4,11 @@ import requests
 from flask import Flask
 from threading import Thread
 
-# 1. Настройка сервера для Render
+# 1. СЕРВЕР ДЛЯ RENDER (порт 10000)
 app = Flask('')
-
 @app.route('/')
 def home():
-    return "Бот запущен и работает!"
+    return "Бот работает!"
 
 def run():
     app.run(host='0.0.0.0', port=10000)
@@ -18,7 +17,7 @@ def keep_alive():
     t = Thread(target=run)
     t.start()
 
-# 2. Настройка самого бота
+# 2. ЛОГИКА БОТА
 TOKEN = os.getenv("BOT_TOKEN")
 bot = telebot.TeleBot(TOKEN)
 
@@ -26,14 +25,14 @@ bot = telebot.TeleBot(TOKEN)
 def start(message):
     url = "https://api.exchangerate-api.com/v4/latest/USD"
     try:
-        response = requests.get(url).json()
-        rate = response['rates']['KZT']
-        bot.send_message(message.chat.id, f"Курс: {rate} KZT\n✅ Аналитика запущена!")
+        data = requests.get(url).json()
+        rate = data['rates']['KZT']
+        bot.reply_to(message, f"Курс: {rate} KZT\n✅ Аналитика запущена!")
     except:
-        bot.send_message(message.chat.id, "Ошибка получения курса")
+        bot.reply_to(message, "Ошибка получения данных")
 
-# 3. Запуск всего вместе
+# 3. ЗАПУСК
 if name == "__main__":
-    keep_alive() # Запускаем веб-сервер на порту 10000
-    print("Веб-сервер запущен...")
-    bot.infinity_polling(timeout=10, long_polling_timeout=5)
+    keep_alive()
+    print("Веб-сервер запущен. Подключаюсь к Telegram...")
+    bot.infinity_polling(timeout=20, long_polling_timeout=10)
