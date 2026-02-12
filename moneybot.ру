@@ -17,7 +17,7 @@ def keep_alive():
     t.start()
 
 # --- ТУТ НАЧИНАЕТСЯ ТВОЙ КОД ---
-token = "ТВОЙ_ТОКЕН_ИЗ_BOTFATHER" # Вставь сюда свой токен
+token=os.getenv("BOT_TOKEN")
 bot = telebot.TeleBot(token)
 
 # Твои функции (handlers) оставляй как были ниже...
