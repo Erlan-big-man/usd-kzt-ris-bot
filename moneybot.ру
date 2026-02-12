@@ -1,13 +1,15 @@
 import os
-from threading import Thread
-from flask import Flask
 import telebot
+import requests
+from flask import Flask
+from threading import Thread
 
-# Это заставляет Render думать, что твой бот — это сайт
+# 1. Настройка сервера для Render
 app = Flask('')
+
 @app.route('/')
 def home():
-    return "Я жив!"
+    return "Бот запущен и работает!"
 
 def run():
     app.run(host='0.0.0.0', port=10000)
@@ -16,32 +18,22 @@ def keep_alive():
     t = Thread(target=run)
     t.start()
 
-# --- ТУТ НАЧИНАЕТСЯ ТВОЙ КОД ---
-token=os.getenv("BOT_TOKEN")
-bot = telebot.TeleBot(token)
-
-# Твои функции (handlers) оставляй как были ниже...
-import os
-import telebot
-import time
-
+# 2. Настройка самого бота
 TOKEN = os.getenv("BOT_TOKEN")
-
 bot = telebot.TeleBot(TOKEN)
 
-@bot.message_handler(commands=["start"])
+@bot.message_handler(commands=['start'])
 def start(message):
-    bot.send_message(
-        message.chat.id,
-        "🤖 Бот мониторинга USD/KZT запущен ✅"
-    )
-
-while True:
+    url = "https://api.exchangerate-api.com/v4/latest/USD"
     try:
-        bot.polling(non_stop=True)
+        response = requests.get(url).json()
+        rate = response['rates']['KZT']
+        bot.send_message(message.chat.id, f"Курс: {rate} KZT\n✅ Аналитика запущена!")
     except:
-        time.sleep(5)
+        bot.send_message(message.chat.id, "Ошибка получения курса")
+
+# 3. Запуск всего вместе
 if name == "__main__":
-    keep_alive()
-    print("Бот запущен...")
+    keep_alive() # Запускаем веб-сервер на порту 10000
+    print("Веб-сервер запущен...")
     bot.infinity_polling(timeout=10, long_polling_timeout=5)
